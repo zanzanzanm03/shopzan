@@ -1,22 +1,16 @@
 const mongodb = require("mongodb");
 const getDb = require("../util/database").getDb;
 
-class Products {
+class Orders {
   constructor(
-    category_name,
     product_name,
     price,
     amount,
-    description,
-    img_path,
     id
   ) {
-    this.category_name = category_name;
     this.product_name = product_name;
     this.price = price;
     this.amount = amount;
-    this.description = description;
-    this.img_path = img_path;
     this._id = id;
   }
 
@@ -26,11 +20,11 @@ class Products {
     if (this._id) {
       // Update the product
       dbOp = db
-        .collection("products")
+        .collection("orders")
         .updateOne({ _id: new mongodb.ObjectId(this._id) }, { $set: this });
     } else {
       // Insert product
-      dbOp = db.collection("products").insertOne(this);
+      dbOp = db.collection("orders").insertOne(this);
     }
     return dbOp
       .then((result) => {
@@ -44,12 +38,12 @@ class Products {
   static fetchAll() {
     const db = getDb();
     return db
-      .collection("products")
+      .collection("orders")
       .find()
       .toArray()
-      .then((products) => {
-        console.log(products);
-        return products;
+      .then((orders) => {
+        console.log(orders);
+        return orders;
       })
       .catch((err) => {
         console.log(err);
@@ -59,7 +53,7 @@ class Products {
   static findById(prodId) {
     const db = getDb();
     return db
-      .collection("products")
+      .collection("orders")
       .find({ _id: new mongodb.ObjectId(prodId) })
       .next()
       .then((product) => {
@@ -74,7 +68,7 @@ class Products {
   static deleteById(prodId) {
     const db = getDb();
     return db
-      .collection("products")
+      .collection("orders")
       .deleteOne({ _id: new mongodb.ObjectId(prodId) })
       .then((result) => {
         console.log("Deleted");
@@ -89,12 +83,12 @@ class Products {
         console.log(prodId);
         
         return db
-            .collection('products')
+            .collection('orders')
             .find({ category_name: prodId })
             .toArray()
-            .then(products => {
-                console.log(products);
-                return products;
+            .then(orders => {
+                console.log(orders);
+                return orders;
             })
             .catch(err => {
                 console.log(err);
@@ -103,4 +97,4 @@ class Products {
 }
 
 
-module.exports = Products;
+module.exports = Orders;

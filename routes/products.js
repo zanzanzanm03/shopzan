@@ -4,17 +4,25 @@ const { check } = require("express-validator");
 const router = express.Router();
 
 const productsController = require("../controllers/products");
+// const productsController = require("../controllers/order");
 router.get("/", productsController.home);
-
-router.get("/detail", productsController.detail);
-
-router.get("/cart", productsController.cart);
-// /admin/add-product => GET
 router.get("/edit", productsController.getSearchProduct);
-
 router.get("/insert", productsController.getAddProduct);
-
+router.get("/cart", productsController.cart);
 router.get("/update/:product_id", productsController.getUpdateProduct);
+router.post('/category', productsController.selectCategory);
+router.post('/addOrder', productsController.postAddOrder);
+router.get("/:product_id", productsController.detail);
+
+
+// /admin/add-product => GET
+// router.get("/edit", productsController.getSearchProduct);
+
+
+
+// router.get("/update/:product_id", productsController.getUpdateProduct);
+
+// router.post('/category', productsController.selectCategory);
 
 // /admin/add-product => POST
 router.post(
@@ -44,5 +52,6 @@ router.post(
 );
 
 router.get("/delete/:product_id", productsController.getDeleteProduct);
+router.get("/deleteorder/:order_id", productsController.getDeleteOrders);
 
 exports.routes = router;

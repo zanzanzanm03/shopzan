@@ -2,12 +2,20 @@
     <%- include('../includes/navigation.ejs') %>
     <div class="container">
         <div class="row">
+            <form class="woocommerce-ordering" action="/category" method="POST">
+                <select id="category_name" name="orderby" class="orderby">
+                    <option value="menu_order" selected="selected">ทั้งหมด</option>
+                    <option value="vegetable">ผัก</option>
+                    <option value="fruit">ผลไม้</option>
+                </select>
+            </form>
+            
             <% if (prods.length > 0) { %>
 
                 <% prods.map((product, index) => { %>
             <div class="col-md-6 col-lg-3 ftco-animate">
                 <div class="product">
-                    <a href="#" class="img-prod"><img class="img-fluid" src=" <%- product.img_path%>" alt="Colorlib Template">
+                    <a href="<%- '/'+product._id%>" class="img-prod"><img class="img-fluid" src=" <%- product.img_path%>" alt="Colorlib Template">
                         <div class="overlay"></div>
                     </a>
                     <div class="text py-3 pb-4 px-3 text-center">

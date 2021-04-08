@@ -2,6 +2,7 @@ const { validationResult } = require("express-validator");
 
 const mongodb = require("mongodb");
 const Product = require("../models/products");
+const Orders = require("../models/order");
 const ObjectId = mongodb.ObjectId;
 
 exports.home = (req, res, next) => {
@@ -18,20 +19,49 @@ exports.home = (req, res, next) => {
 };
 
 exports.detail = (req, res, next) => {
-  Product.fetchAll()
-    .then((products) => {
-      res.render('products/detail', {
-        pageTitle: "detail",
-        prods: products,
+  console.log(req.params);
+  const { product_id } = req.params;
+  let product_name = "";
+  let price = "";
+  let description= "";
+  let img_path= "";
+
+  Product.findById(product_id)
+      .then(product => {
+          console.log(product);
+          product_name = product.product_name;
+          price = product.price;
+          description = product.description;
+          img_path = product.img_path;
+          res.render('products/detail', {
+              errorMessage: null,
+              product_id: product_id,
+              product_name: product_name,
+              price: price,
+              description : description,
+              img_path : img_path
+          });
+      })
+      .catch(err => console.log(err));
+};
+
+exports.selectCategory = (req, res, next) => {
+  const { orderby } = req.body;
+  
+  Product.fetchCategory(orderby)
+      .then(products => {
+          res.render('products/search', {
+              
+              prods: products,
+          });
+      })
+      .catch(err => {
+          console.log(err);
       });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
 };
 
 exports.cart = (req, res, next) => {
-  Product.fetchAll()
+  Orders.fetchAll()
     .then((products) => {
       res.render('products/cart', {
         pageTitle: "cart",
@@ -73,6 +103,30 @@ exports.getAddProduct = (req, res, next) => {
     description: description,
     img_path: img_path,
   });
+};
+
+exports.postAddOrder = (req, res, next) => {
+  console.log(req.body);
+  const amount = 1;
+  const {
+    product_name,
+    price,
+  } = req.body;
+  const product = new Orders(
+    product_name,
+    price,
+    amount,
+  );
+  product
+    .save()
+    .then((result) => {
+      // console.log(result);
+      console.log("Created Product");
+      res.redirect("/cart");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 exports.postAddProduct = (req, res, next) => {
@@ -132,8 +186,12 @@ exports.getUpdateProduct = (req, res, next) => {
   Product.findById(product_id)
     .then((product) => {
       console.log(product);
+      category_name = product.category_name;
       product_name = product.product_name;
       price = product.price;
+      amount = product.amount;
+      description = product.description;
+      img_path = product.img_path;
       res.render("products/update", {
         pageTitle: "Update Product",
         errorMessage: null,
@@ -173,7 +231,7 @@ exports.postUpdateProduct = (req, res, next) => {
     .save()
     .then((result) => {
       console.log("Update Product");
-      res.redirect("/products/search");
+      res.redirect("/edit");
     })
     .catch((err) => console.log(err));
 };
@@ -185,6 +243,17 @@ exports.getDeleteProduct = (req, res, next) => {
     .then(() => {
       console.log("Delete Product");
       res.redirect("/edit");
+    })
+    .catch((err) => console.log(err));
+};
+
+exports.getDeleteOrders = (req, res, next) => {
+  const { order_id } = req.params;
+  console.log(order_id);
+  Orders.deleteById(order_id)
+    .then(() => {
+      console.log("Delete Product");
+      res.redirect("/cart");
     })
     .catch((err) => console.log(err));
 };
